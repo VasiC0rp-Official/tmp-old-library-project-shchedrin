@@ -89,3 +89,20 @@ def add_reader(last_name, first_name, student_card, group_name, phone):
         print(f"Ошибка: читатель с билетом {student_card} уже существует.")
     finally:
         conn.close()
+
+
+def delete_reader(reader_id):
+    """
+    Удаляет читателя по его ID.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM issues WHERE reader_id = ?", (reader_id,))
+    if cursor.fetchone()[0]:
+        print("Нельзя удалить читателя: у него есть активные выдачи.")
+        conn.close()
+        return
+    cursor.execute("DELETE FROM readers WHERE id = ?", (reader_id,))
+    conn.commit()
+    conn.close()
+    print(f"Читатель с ID {reader_id} удалён.")
